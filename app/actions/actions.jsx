@@ -29,7 +29,8 @@ export var startAddTodo = (text) => {
       createdAt: moment().unix(),
       completedAt: null
     };
-    var todoRef = firebaseRef.child('todos').push(todo);
+    var uid = getState().auth.uid;
+    var todoRef = firebaseRef.child(`users/${uid}/todos`).push(todo);
 
     return todoRef.then(() => {
       dispatch(addTodo({
@@ -41,7 +42,8 @@ export var startAddTodo = (text) => {
 };
 export var startAddTodos = () => {
   return (dispatch, getState) => {
-    var todosRef = firebaseRef.child('todos');
+    var uid = getState().auth.uid;
+    var todosRef = firebaseRef.child(`users/${uid}/todos`);
 
     return todosRef.once('value').then((snapshot) => {
       var todos = snapshot.val() || {};
@@ -72,7 +74,8 @@ export var updateTodo = (id, updates) => {
 };
 export var startToggleTodo = (id, completed) => {
   return (dispatch, getState) => {
-    var todoRef = firebaseRef.child('todos/' +id);
+    var uid = getState().auth.uid;
+    var todoRef = firebaseRef.child(`users/${uid}/todos/${id}`);
     var updates = {
       completed: completed,
       completedAt: completed ? moment().unix() : null
@@ -82,7 +85,12 @@ export var startToggleTodo = (id, completed) => {
     });
   };
 };
-
+export const login = (uid) => {
+  return {
+    type: 'LOGIN',
+    uid
+  };
+};
 export var startLogin = () => {
   return (dispatch, getState) => {
     return firebase.auth().signInWithPopup(githubProvider).then((result) => {
@@ -90,6 +98,11 @@ export var startLogin = () => {
     }, (error) => {
       console.log('Unable to auth', error);
     });
+  };
+};
+export var logout = () => {
+  return {
+    type: 'LOGOUT'
   };
 };
 export var startLogout = () => {

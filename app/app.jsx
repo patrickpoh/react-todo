@@ -10,13 +10,16 @@ import router from 'app/router/';
 
 firebase.auth().onAuthStateChanged((user) => {
   if (user) {
+    store.dispatch(actions.login(user.uid));
+    store.dispatch(actions.startAddTodos());
     hashHistory.push('/todos');
   } else {
+    store.dispatch(actions.logout());
     hashHistory.push('/');
   }
 });
 
-store.dispatch(actions.startAddTodos());
+
 //Load foundation-sites
 // require('style!css!foundation-sites/dist/foundation.min.css')
 // require('foundation-sites/dist/foundation.min.css')
